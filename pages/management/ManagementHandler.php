@@ -233,6 +233,7 @@ class ManagementHandler extends Handler
                 'name' => __('announcement.announcements'),
                 'url' => $router->url($request, null, 'management', 'settings', 'announcements'),
                 'isCurrent' => false,
+                'icon' => 'Announcements',
             ],
         ]);
 
@@ -333,6 +334,7 @@ class ManagementHandler extends Handler
                 'name' => __('institution.institutions'),
                 'url' => $router->url($request, null, 'management', 'settings', 'institutions'),
                 'isCurrent' => false,
+                'icon' => 'Institutes',
             ],
         ]);
         $templateMgr->assign([
