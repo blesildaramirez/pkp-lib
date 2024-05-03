@@ -986,6 +986,7 @@ class PKPTemplateManager extends Smarty
                                     'name' => __('navigation.dashboards'),
                                     'url' => $router->url($request, null, 'dashboard', 'editorial'),
                                     'isCurrent' => $router->getRequestedPage($request) === 'dashboards',
+                                    'icon' => 'Dashboard',
                                 ];
                             }
                             if(count(array_intersect([ Role::ROLE_ID_REVIEWER], $userRoles))) {
@@ -993,6 +994,7 @@ class PKPTemplateManager extends Smarty
                                     'name' => __('navigation.reviewAssignments'),
                                     'url' => $router->url($request, null, 'dashboard', 'reviewAssignments'),
                                     'isCurrent' => $router->getRequestedPage($request) === 'reviewAssignments',
+                                    'icon' => 'ReviewAssignments',
                                 ];
                             }
                             if(count(array_intersect([  Role::ROLE_ID_AUTHOR], $userRoles))) {
@@ -1000,6 +1002,7 @@ class PKPTemplateManager extends Smarty
                                     'name' => __('navigation.mySubmissions'),
                                     'url' => $router->url($request, null, 'dashboard', 'mySubmissions'),
                                     'isCurrent' => $router->getRequestedPage($request) === 'mySubmissions',
+                                    'icon' => 'MySubmissions',
                                 ];
                             }
                         } else {
@@ -1007,6 +1010,7 @@ class PKPTemplateManager extends Smarty
                                 'name' => __('navigation.submissions'),
                                 'url' => $router->url($request, null, 'submissions'),
                                 'isCurrent' => $router->getRequestedPage($request) === 'submissions',
+                                'icon' => 'MySubmissions'
                             ];
 
                         }
@@ -1015,6 +1019,7 @@ class PKPTemplateManager extends Smarty
                             'name' => __('author.submit'),
                             'url' => $router->url($request, null, 'submission'),
                             'isCurrent' => $router->getRequestedPage($request) === 'submission',
+                            'icon' => 'MySubmissions'
                         ];
                     }
 
@@ -1032,6 +1037,7 @@ class PKPTemplateManager extends Smarty
                                 'name' => __('doi.manager.displayName'),
                                 'url' => $router->url($request, null, 'dois'),
                                 'isCurrent' => $request->getRequestedPage() === 'dois',
+                                'icon' => 'NavDoi'
                             ];
                         }
 
@@ -1044,6 +1050,7 @@ class PKPTemplateManager extends Smarty
                         }
                         $menu['settings'] = [
                             'name' => __('navigation.settings'),
+                            'icon' => 'Settings',
                             'submenu' => [
                                 'context' => [
                                     'name' => __('context.context'),
@@ -1077,6 +1084,7 @@ class PKPTemplateManager extends Smarty
                     if (count(array_intersect([Role::ROLE_ID_MANAGER, Role::ROLE_ID_SITE_ADMIN, Role::ROLE_ID_SUB_EDITOR], $userRoles))) {
                         $menu['statistics'] = [
                             'name' => __('navigation.tools.statistics'),
+                            'icon' => 'Statistics',
                             'submenu' => [
                                 'publications' => [
                                     'name' => __('common.publications'),
@@ -1116,6 +1124,7 @@ class PKPTemplateManager extends Smarty
                             'name' => __('navigation.tools'),
                             'url' => $router->url($request, null, 'management', 'tools'),
                             'isCurrent' => $router->getRequestedPage($request) === 'management' && $router->getRequestedOp($request) === 'tools',
+                            'icon' => 'Tools',
                         ];
                     }
 
@@ -1124,6 +1133,7 @@ class PKPTemplateManager extends Smarty
                             'name' => __('navigation.admin'),
                             'url' => $router->url($request, Application::SITE_CONTEXT_PATH, 'admin'),
                             'isCurrent' => $router->getRequestedPage($request) === 'admin',
+                            'icon' => 'NavAdmin',
                         ];
                     }
                 }
