@@ -1048,6 +1048,7 @@ class PKPTemplateManager extends Smarty
                                 'name' => __('announcement.announcements'),
                                 'url' => $router->url($request, null, 'management', 'settings', 'announcements'),
                                 'isCurrent' => $router->getRequestedPage($request) === 'management' && in_array('announcements', (array) $router->getRequestedArgs($request)),
+                                'icon' => 'Announcements'
                             ];
                         }
 
@@ -1065,6 +1066,7 @@ class PKPTemplateManager extends Smarty
                                 'name' => __('institution.institutions'),
                                 'url' => $router->url($request, null, 'management', 'settings', 'institutions'),
                                 'isCurrent' => $request->getRequestedPage() === 'management' && in_array('institutions', (array) $request->getRequestedArgs()),
+                                'icon' => 'Institutes'
                             ];
                         }
                         $menu['settings'] = [
