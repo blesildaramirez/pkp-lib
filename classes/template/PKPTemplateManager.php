@@ -1055,6 +1055,7 @@ class PKPTemplateManager extends Smarty
                         $menu['settings'] = [
                             'name' => __('navigation.settings'),
                             'icon' => 'Settings',
+                            'url' => $settingsContextLink,
                             'addMargin' => true,
                             'submenu' => [
                                 'context' => [
