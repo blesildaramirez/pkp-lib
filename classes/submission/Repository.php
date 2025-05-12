@@ -231,8 +231,7 @@ abstract class Repository
         // Send reviewers to review wizard
         $reviewAssignment = Repo::reviewAssignment()->getCollector()
             ->filterBySubmissionIds([$submission->getId()])
-            ->filterByReviewerIds([$user->getId()])
-            ->filterByLastReviewRound(true)
+            ->filterByReviewerIds([$user->getId()], true)
             ->getMany()
             ->first();
 

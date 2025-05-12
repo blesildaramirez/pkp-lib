@@ -1120,8 +1120,7 @@ class PKPSubmissionController extends PKPBaseController
 
         $currentUserReviewAssignment = Repo::reviewAssignment()->getCollector()
             ->filterBySubmissionIds([$submission->getId()])
-            ->filterByReviewerIds([$request->getUser()->getId()])
-            ->filterByLastReviewRound(true)
+            ->filterByReviewerIds([$request->getUser()->getId()], true)
             ->getMany()
             ->first();
 
