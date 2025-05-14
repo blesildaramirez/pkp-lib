@@ -39,9 +39,4 @@ enum VersionStage: string
     {
         return __($this->labelKey(), locale: $locale);
     }
-
-    public static function getVersions(): array
-    {
-        return self::cases();
-    }
 }

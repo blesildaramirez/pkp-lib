@@ -34,7 +34,7 @@ class VersionForm extends FormComponent
         $this->showErrorFooter = false;
 
         $versionStages = [];
-        $allVersionStages = VersionStage::getVersions();
+        $allVersionStages = VersionStage::cases();
 
         foreach ($allVersionStages as $versionStage) {
             $versionStages[] = [
