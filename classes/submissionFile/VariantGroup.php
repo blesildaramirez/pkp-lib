@@ -28,56 +28,34 @@ class VariantGroup extends Model
     protected $guarded = [];
 
     /**
-     * Maximum number of files allowed in a single variant group.
-     */
-    public const MAX_GROUP_SIZE = 2;
-
-    /**
      * Link two media submission files into a variant group and propagate metadata from primary to secondary.
      *
-     * @throws \Exception on validation failure (group conflict, capacity)
+     * Linking is one-to-one: if either file already belongs to a group, that group is
+     * dissolved first so the new pair can be formed (re-linking replaces the old link).
      */
     public static function link(SubmissionFile $primaryFile, SubmissionFile $secondaryFile, int $submissionId): void
     {
         $primaryGroupId = $primaryFile->getData('variantGroupId');
         $secondaryGroupId = $secondaryFile->getData('variantGroupId');
 
-        // Already in the same group
+        // Already linked to each other
         if ($primaryGroupId && $secondaryGroupId && $primaryGroupId === $secondaryGroupId) {
             return;
         }
 
-        // Both in different groups
-        if ($primaryGroupId && $secondaryGroupId && $primaryGroupId !== $secondaryGroupId) {
-            throw new \Exception(__('api.submissionFiles.400.filesInDifferentGroups'));
+        // Break any existing pairing for either file before forming the new one
+        if ($primaryGroupId) {
+            static::unlink($primaryFile, $submissionId);
+            $primaryFile = Repo::submissionFile()->get($primaryFile->getId());
+        }
+        if ($secondaryGroupId) {
+            static::unlink($secondaryFile, $submissionId);
+            $secondaryFile = Repo::submissionFile()->get($secondaryFile->getId());
         }
 
-        // Check capacity on existing groups
-        foreach (array_filter([$primaryGroupId, $secondaryGroupId]) as $groupId) {
-            $count = Repo::submissionFile()
-                ->getCollector()
-                ->filterBySubmissionIds([$submissionId])
-                ->filterByFileStages([SubmissionFile::SUBMISSION_FILE_MEDIA])
-                ->filterByVariantGroupIds([$groupId])
-                ->getMany()
-                ->count();
-
-            if ($count >= static::MAX_GROUP_SIZE) {
-                throw new \Exception(__('api.submissionFiles.400.variantGroupAtCapacity'));
-            }
-        }
-
-        // Create or reuse group
-        if (!$primaryGroupId && !$secondaryGroupId) {
-            $variantGroup = static::create([]);
-            $variantGroupId = $variantGroup->getKey();
-            Repo::submissionFile()->edit($primaryFile, ['variantGroupId' => $variantGroupId]);
-            Repo::submissionFile()->edit($secondaryFile, ['variantGroupId' => $variantGroupId]);
-        } elseif ($primaryGroupId) {
-            Repo::submissionFile()->edit($secondaryFile, ['variantGroupId' => $primaryGroupId]);
-        } else {
-            Repo::submissionFile()->edit($primaryFile, ['variantGroupId' => $secondaryGroupId]);
-        }
+        $variantGroupId = static::create([])->getKey();
+        Repo::submissionFile()->edit($primaryFile, ['variantGroupId' => $variantGroupId]);
+        Repo::submissionFile()->edit($secondaryFile, ['variantGroupId' => $variantGroupId]);
 
         // Apply common fields from primary to secondary
         $primaryFile = Repo::submissionFile()->get($primaryFile->getId());
