@@ -15,6 +15,7 @@
 
 namespace PKP\API\v1\submissions\tasks\resources;
 
+use APP\facades\Repo;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use PKP\core\traits\ResourceWithData;
@@ -78,16 +79,25 @@ class EditorialTaskParticipantResource extends JsonResource
             }
         }
 
-        $reviewMethod = null;
-        if ($reviewAssignments->isNotEmpty()) {
-            $reviewAssignmentsForUser = $reviewAssignments->first(fn (ReviewAssignment $reviewAssignment) => $reviewAssignment->getReviewerId() == $this->userId);
-            if ($reviewAssignmentsForUser) {
-                $roles[Role::ROLE_ID_REVIEWER] = $reviewerRoleName;
-                $reviewMethods = $reviewAssignments->map(fn (ReviewAssignment $reviewAssignment) => $reviewAssignment->getReviewMethod())->unique();
-                $reviewMethod = $reviewMethods->first(fn () => ReviewAssignment::SUBMISSION_REVIEW_METHOD_DOUBLEANONYMOUS) ??
-                    $reviewMethods->first(fn () => ReviewAssignment::SUBMISSION_REVIEW_METHOD_ANONYMOUS) ??
-                    $reviewMethods->firstWhere(fn () => ReviewAssignment::SUBMISSION_REVIEW_METHOD_OPEN);
-            }
+        // Build the review method per round for this participant's own review assignments
+        $reviewMethods = [];
+        $userReviewAssignments = $reviewAssignments->filter(
+            fn (ReviewAssignment $reviewAssignment) => $reviewAssignment->getReviewerId() == $this->userId
+        );
+        if ($userReviewAssignments->isNotEmpty()) {
+            $roles[Role::ROLE_ID_REVIEWER] = $reviewerRoleName;
+            $reviewMethodKeys = Repo::reviewAssignment()->getReviewMethodsTranslationKeys();
+            $reviewMethods = $userReviewAssignments
+                ->sortBy(fn (ReviewAssignment $reviewAssignment) => $reviewAssignment->getRound())
+                ->unique(fn (ReviewAssignment $reviewAssignment) => $reviewAssignment->getRound())
+                ->map(fn (ReviewAssignment $reviewAssignment) => [
+                    'round' => $reviewAssignment->getRound(),
+                    'roundLabel' => __('common.reviewRoundNumber', ['round' => $reviewAssignment->getRound()]),
+                    'method' => $reviewAssignment->getReviewMethod(),
+                    'methodLabel' => __($reviewMethodKeys[$reviewAssignment->getReviewMethod()]),
+                ])
+                ->values()
+                ->all();
         }
 
         $groupedRoles = [];
@@ -98,7 +108,7 @@ class EditorialTaskParticipantResource extends JsonResource
             ];
 
             if ($roleId == Role::ROLE_ID_REVIEWER) {
-                $role['reviewMethod'] = $reviewMethod;
+                $role['reviewMethods'] = $reviewMethods;
             }
             $groupedRoles[] = $role;
         }

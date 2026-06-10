@@ -995,7 +995,11 @@ class EditorialTaskController extends PKPBaseController
             $reviewerId = $reviewAssignment->getReviewerId();
             if (!$users->has($reviewerId)) {
                 $users->put($reviewerId, Repo::user()->get($reviewerId));
-                $includedReviewAssignments->push($reviewAssignment);
+                // Include all accessible review assignments (every round) for this reviewer,
+                // so the participant resource can list the review method per round.
+                $reviewAssignments
+                    ->filter(fn (ReviewAssignment $ra) => $ra->getReviewerId() == $reviewerId)
+                    ->each(fn (ReviewAssignment $ra) => $includedReviewAssignments->push($ra));
             }
         }
 
