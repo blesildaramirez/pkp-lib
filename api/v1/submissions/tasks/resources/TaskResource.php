@@ -15,6 +15,7 @@
 
 namespace PKP\API\v1\submissions\tasks\resources;
 
+use APP\core\Application;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Carbon;
@@ -78,6 +79,9 @@ class TaskResource extends JsonResource
             }
         }
 
+        $pkpRequest = Application::get()->getRequest();
+        $context = $pkpRequest->getContext();
+
         foreach ($activities as $activity) {
             $taskDateDueOld = $activity->getData('taskDateDueOld');
             $taskDateDueNew = $activity->getData('taskDateDueNew');
@@ -97,6 +101,26 @@ class TaskResource extends JsonResource
                 'userFullName' => $activity->getLocalizedData('userFullName'),
             ]);
 
+            // Build a download link for file-upload activity entries so the file can be retrieved.
+            // Removed-file entries get no link since the underlying submission file is hard-deleted.
+            $fileId = $activity->getData('fileId');
+            $downloadUrl = null;
+            if ($fileId && $activity->getEventType() == PKPSubmissionEventLogEntry::SUBMISSION_LOG_TASK_FILE_UPLOADED) {
+                $downloadUrl = $pkpRequest->getDispatcher()->url(
+                    $pkpRequest,
+                    Application::ROUTE_COMPONENT,
+                    $context->getData('urlPath'),
+                    'api.file.FileApiHandler',
+                    'downloadFile',
+                    null,
+                    [
+                        'submissionFileId' => $fileId,
+                        'submissionId' => $activity->getData('submissionId') ?? $submission->getId(),
+                        'stageId' => $activity->getData('stageId') ?? $this->stageId,
+                    ]
+                );
+            }
+
             $latestActivities[] = [
                 'id' => $activity->getId(),
                 'message' => $activityMessage,
@@ -104,6 +128,8 @@ class TaskResource extends JsonResource
                 'date' => $activity->getDateLogged(),
                 'userFullName' => $activity->getLocalizedData('userFullName'),
                 'userId' => $activity->getData('userId'),
+                'fileId' => $fileId,
+                'downloadUrl' => $downloadUrl,
             ];
         }
 
