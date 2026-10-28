@@ -43,6 +43,7 @@ class NavigationMenuItem extends \PKP\core\DataObject
 
     public bool $_isDisplayed = true;
     public bool $_isChildVisible = false;
+    public bool $_isCurrent = false;
 
     //
     // Get/set methods
@@ -234,6 +235,26 @@ class NavigationMenuItem extends \PKP\core\DataObject
     public function setIsChildVisible(bool $isChildVisible): void
     {
         $this->_isChildVisible = $isChildVisible;
+    }
+
+    /**
+     * Get $isCurrent for this navigation menu item.
+     *
+     * @return bool True if the item links to the page being viewed. It is defined at the Service functionality level
+     */
+    public function getIsCurrent(): bool
+    {
+        return $this->_isCurrent;
+    }
+
+    /**
+     * Set $isCurrent for this navigation menu item.
+     *
+     * @param bool $isCurrent true if the item links to the page being viewed. It is defined at the Service functionality level
+     */
+    public function setIsCurrent(bool $isCurrent): void
+    {
+        $this->_isCurrent = $isCurrent;
     }
 
     /**

@@ -490,7 +490,24 @@ class PKPNavigationMenuService
                 }
             }
             $this->getDisplayStatus($nmi, $navigationMenu);
+            $nmi->setIsCurrent($this->isCurrentPage($nmi));
         }
+    }
+
+    /**
+     * Whether the navigation menu item links to the page being viewed
+     */
+    private function isCurrentPage(NavigationMenuItem $navigationMenuItem): bool
+    {
+        $request = Application::get()->getRequest();
+
+        // The home page can be reached with or without the index page in the URL
+        if ($navigationMenuItem->getType() === NavigationMenuItem::NMI_TYPE_HOME) {
+            return in_array($request->getRequestedPage(), ['', 'index']);
+        }
+
+        $url = $navigationMenuItem->getUrl();
+        return $url !== null && strtok($url, '?#') === $request->getRequestUrl();
     }
 
     /**

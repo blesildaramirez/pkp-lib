@@ -19,18 +19,16 @@
 			{if !$navigationMenuItemAssignment->navigationMenuItem->getIsDisplayed()}
 				{continue}
 			{/if}
-			{assign var=navigationMenuItemUrl value=$navigationMenuItemAssignment->navigationMenuItem->getUrl()}
 			<li class="{$liClass|escape}">
-				<a href="{$navigationMenuItemUrl}"{if $navigationMenuItemUrl == $currentUrl} aria-current="page"{/if}>
+				<a href="{$navigationMenuItemAssignment->navigationMenuItem->getUrl()}"{if $navigationMenuItemAssignment->navigationMenuItem->getIsCurrent()} aria-current="page"{/if}>
 					{$navigationMenuItemAssignment->navigationMenuItem->getLocalizedTitle()}
 				</a>
 				{if $navigationMenuItemAssignment->navigationMenuItem->getIsChildVisible()}
 					<ul>
 						{foreach key=childField item=childNavigationMenuItemAssignment from=$navigationMenuItemAssignment->children}
 							{if $childNavigationMenuItemAssignment->navigationMenuItem->getIsDisplayed()}
-								{assign var=childNavigationMenuItemUrl value=$childNavigationMenuItemAssignment->navigationMenuItem->getUrl()}
 								<li class="{$liClass|escape}">
-									<a href="{$childNavigationMenuItemUrl}"{if $childNavigationMenuItemUrl == $currentUrl} aria-current="page"{/if}>
+									<a href="{$childNavigationMenuItemAssignment->navigationMenuItem->getUrl()}"{if $childNavigationMenuItemAssignment->navigationMenuItem->getIsCurrent()} aria-current="page"{/if}>
 										{$childNavigationMenuItemAssignment->navigationMenuItem->getLocalizedTitle()}
 									</a>
 								</li>

@@ -2751,7 +2751,6 @@ class PKPTemplateManager extends Smarty
 
         $this->assign([
             'navigationMenu' => $navigationMenu,
-            'currentUrl' => $this->_request->getCompleteUrl(),
             'id' => $params['id'],
             'ulClass' => $params['ulClass'] ?? '',
             'liClass' => $params['liClass'] ?? '',
